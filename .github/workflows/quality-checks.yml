@@ -1,0 +1,35 @@
+name: "Quality Checks"
+
+on:
+  pull_request:
+    types: [ "opened", "reopened", "synchronize" ]
+  push:
+  workflow_dispatch: {}
+
+env:
+  MAVEN_SETTINGS: ${{ secrets.MAVEN_SETTINGS }}
+  MAVEN_SETTINGS_SECURITY: ${{ secrets.MAVEN_SETTINGS_SECURITY }}
+
+jobs:
+  run-tests:
+    # Skip the job if the CI was triggered by a pull request that was merged,
+    # because the CI was already running for the pull request.
+    # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-your-pull_request-workflow-when-a-pull-request-merges
+    if: github.event.pull_request.merged == false
+    runs-on: docker
+    steps:
+      - name: "Setup"
+        uses: dedalus-cis4u/with-standard-setup@v2.0.15
+        with:
+          git-checkout: 'all'
+          maven: true
+          java: 21
+      - name: "Run tests"
+        run: mvn -ntp clean test
+
+  run-sonar:
+    needs: run-tests
+    runs-on: docker
+    steps:
+      - name: "Run SonarQube Analysis"
+        run: mvn sonar:sonar
