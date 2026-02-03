@@ -3,7 +3,6 @@ name: "Quality Checks"
 on:
   pull_request:
     types: [ "opened", "reopened", "synchronize" ]
-  push:
   workflow_dispatch: {}
 
 env:
@@ -51,4 +50,4 @@ jobs:
       - name: "Run SonarQube Analysis"
         run: |
           mvn sonar:sonar \
-            -Dsonar.coverage.jacoco.xmlReportPaths=coverage/jacoco.xml
+            -Dsonar.coverage.jacoco.xmlReportPaths=coverage/jacoco.xml -Dsonar.projectKey=Testproject -Dsonar.host.url=https://sonarqube.orbis.dedalus.com/central-prod
