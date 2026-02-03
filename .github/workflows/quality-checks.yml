@@ -3,7 +3,6 @@ name: "Quality Checks"
 on:
   pull_request:
     types: [ "opened", "reopened", "synchronize" ]
-  push:
   workflow_dispatch: {}
 
 env:
@@ -32,4 +31,4 @@ jobs:
     runs-on: docker
     steps:
       - name: "Run SonarQube Analysis"
-        run: mvn sonar:sonar
+        run: mvn sonar:sonar -Dsonar.projectKey=Testproject -Dsonar.host.url=https://sonarqube.orbis.dedalus.com/central-prod
