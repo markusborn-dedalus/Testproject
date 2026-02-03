@@ -11,9 +11,6 @@ env:
 
 jobs:
   run-tests:
-    # Skip the job if the CI was triggered by a pull request that was merged,
-    # because the CI was already running for the pull request.
-    # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-your-pull_request-workflow-when-a-pull-request-merges
     if: github.event.pull_request.merged == false
     runs-on: docker
     steps:
@@ -23,12 +20,34 @@ jobs:
           git-checkout: 'all'
           maven: true
           java: 21
+
       - name: "Run tests"
-        run: mvn -ntp clean test
+        run: mvn -ntp clean verify
+
+      - name: "Upload coverage report"
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: jacoco-report-aggregate/target/site/jacoco-aggregate/jacoco.xml
+          if-no-files-found: error
 
   run-sonar:
     needs: run-tests
     runs-on: docker
     steps:
+      - name: "Setup"
+        uses: dedalus-cis4u/with-standard-setup@v2.0.15
+        with:
+          maven: true
+          java: 21
+
+      - name: "Download coverage report"
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage
+          path: coverage
+
       - name: "Run SonarQube Analysis"
-        run: mvn sonar:sonar -Dsonar.projectKey=Testproject -Dsonar.host.url=https://sonarqube.orbis.dedalus.com/central-prod
+        run: |
+          mvn sonar:sonar \
+            -Dsonar.coverage.jacoco.xmlReportPaths=coverage/jacoco.xml -Dsonar.projectKey=Testproject -Dsonar.host.url=https://sonarqube.orbis.dedalus.com/central-prod
