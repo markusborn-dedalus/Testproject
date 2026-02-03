@@ -4,7 +4,7 @@
 
     <groupId>com.dedalus.oas</groupId>
     <artifactId>Testproject</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.1</version>
     <packaging>pom</packaging>
 
     <name>Testproject</name>
