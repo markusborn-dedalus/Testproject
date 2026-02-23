@@ -5,10 +5,6 @@ on:
     types: [ "opened", "reopened", "synchronize" ]
   workflow_dispatch: {}
 
-env:
-  MAVEN_SETTINGS: ${{ secrets.MAVEN_SETTINGS }}
-  MAVEN_SETTINGS_SECURITY: ${{ secrets.MAVEN_SETTINGS_SECURITY }}
-
 jobs:
   run-tests:
     if: github.event.pull_request.merged == false
@@ -27,6 +23,21 @@ jobs:
           if-no-files-found: error
 
   run-sonar:
+    env:
+      SONAR_CMD_BASE: >
+        mvn --batch-mode --no-transfer-progress sonar:sonar
+        -Dsonar.token=$SONAR_TOKEN
+        -Dsonar.coverage.jacoco.xmlReportPaths="test-coverage-report/target/site/jacoco-aggregate/jacoco.xml"
+        -Dsonar.projectKey=HOPF-${{ github.event.repository.name }}
+        -Dsonar.projectName=HOPF-${{ github.event.repository.name }}
+        -Dsonar.host.url=https://sonarqube.orbis.dedalus.com/central-test
+        -Dsonar.qualitygate.wait=true
+        -Dsonar.plugins.downloadOnlyRequired=true
+      CI_PR_NUMBER: ${{ github.event.number }}
+      CI_GITHUB_EVENT_NAME: ${{ github.event_name }}
+      CI_GITHUB_HEAD_REF: ${{ github.head_ref }}
+      CI_GITHUB_BASE_REF: ${{ github.base_ref }}
+      CI_GITHUB_REPOSITORY: ${{ github.repository }}
     needs: run-tests
     runs-on: ubuntu-latest
     steps:
