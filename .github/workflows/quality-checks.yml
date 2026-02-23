@@ -12,7 +12,7 @@ env:
 jobs:
   run-tests:
     if: github.event.pull_request.merged == false
-    runs-on: docker
+    runs-on: ubuntu-latest
     steps:
       - name: "Setup"
         uses: dedalus-cis4u/with-standard-setup@v2.0.15
@@ -33,7 +33,7 @@ jobs:
 
   run-sonar:
     needs: run-tests
-    runs-on: docker
+    runs-on: ubuntu-latest
     steps:
       - name: "Setup"
         uses: dedalus-cis4u/with-standard-setup@v2.0.15
