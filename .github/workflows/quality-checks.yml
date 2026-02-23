@@ -14,6 +14,8 @@ jobs:
     if: github.event.pull_request.merged == false
     runs-on: ubuntu-latest
     steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
       - name: "Run tests"
         run: mvn -ntp clean verify
 
@@ -28,6 +30,8 @@ jobs:
     needs: run-tests
     runs-on: ubuntu-latest
     steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
       - name: "Download coverage report"
         uses: actions/download-artifact@v4
         with:
