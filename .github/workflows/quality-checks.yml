@@ -47,7 +47,18 @@ jobs:
           name: coverage
           path: coverage
 
-      - name: "Run SonarQube Analysis"
+      - name: "Run SonarQube Analysis (manually triggered)"
+        if: github.event_name == 'workflow_dispatch'
         run: |
-          mvn sonar:sonar \
-            -Dsonar.coverage.jacoco.xmlReportPaths=coverage/jacoco.xml -Dsonar.projectKey=Testproject -Dsonar.host.url=https://sonarqube.orbis.dedalus.com/central-prod
+          $SONAR_CMD_BASE
+
+      - name: "Run SonarQube Analysis (pull request)"
+        if: github.event_name == 'pull_request'
+        run: |
+          $SONAR_CMD_BASE \
+            -Dsonar.pullrequest.provider=github \
+            -Dsonar.pullrequest.key=$CI_PR_NUMBER \
+            -Dsonar.pullrequest.branch=$CI_GITHUB_HEAD_REF \
+            -Dsonar.pullrequest.base=$CI_GITHUB_BASE_REF \
+            -Dsonar.pullrequest.github.repository=$CI_GITHUB_REPOSITORY \
+            -Dsonar.scm.provider=git
