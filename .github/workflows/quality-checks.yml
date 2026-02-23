@@ -3,15 +3,21 @@ name: "Quality Checks"
 on:
   pull_request:
     types: [ "opened", "reopened", "synchronize" ]
-  workflow_dispatch: {}
+  workflow_dispatch: { }
 
 jobs:
   run-tests:
     if: github.event.pull_request.merged == false
-    runs-on: ubuntu-latest
+    runs-on:
+      labels: docker
     steps:
-      - name: "Checkout code"
-        uses: actions/checkout@v4
+      - name: "Setup"
+        uses: dedalus-cis4u/with-standard-setup@v2.0.15
+        with:
+          git-checkout: 'all'
+          maven: true
+          java: 21
+
       - name: "Run tests"
         run: mvn -ntp clean verify
 
@@ -23,6 +29,8 @@ jobs:
           if-no-files-found: error
 
   run-sonar:
+    runs-on:
+      labels: docker
     env:
       SONAR_CMD_BASE: >
         mvn --batch-mode --no-transfer-progress sonar:sonar
@@ -39,10 +47,10 @@ jobs:
       CI_GITHUB_BASE_REF: ${{ github.base_ref }}
       CI_GITHUB_REPOSITORY: ${{ github.repository }}
     needs: run-tests
-    runs-on: ubuntu-latest
     steps:
-      - name: "Checkout code"
-        uses: actions/checkout@v4
+      - name: "Setup"
+        uses: dedalus-cis4u/with-standard-setup@v2.0.15
+
       - name: "Download coverage report"
         uses: actions/download-artifact@v4
         with:
