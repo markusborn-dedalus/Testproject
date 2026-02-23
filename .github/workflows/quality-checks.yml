@@ -14,13 +14,6 @@ jobs:
     if: github.event.pull_request.merged == false
     runs-on: ubuntu-latest
     steps:
-      - name: "Setup"
-        uses: dedalus-cis4u/with-standard-setup@v2.0.15
-        with:
-          git-checkout: 'all'
-          maven: true
-          java: 21
-
       - name: "Run tests"
         run: mvn -ntp clean verify
 
@@ -35,12 +28,6 @@ jobs:
     needs: run-tests
     runs-on: ubuntu-latest
     steps:
-      - name: "Setup"
-        uses: dedalus-cis4u/with-standard-setup@v2.0.15
-        with:
-          maven: true
-          java: 21
-
       - name: "Download coverage report"
         uses: actions/download-artifact@v4
         with:
